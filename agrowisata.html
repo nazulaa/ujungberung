@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agro Desa Ujungberung — Potensi Pertanian & Kehutanan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #0d3d1a;
+    --primary-container: #1B5E20;
+    --secondary: #1B5E20;
+    --secondary-container: #fbe04c;
+    --secondary-fixed: #fbe04c;
+    --surface: #fafaf8;
+    --surface-container: #ede9e0;
+    --surface-container-low: #f5f3f0;
+    --surface-container-high: #e3dfdd;
+    --on-surface: #1a1a1a;
+    --on-surface-variant: #49453e;
+    --outline-variant: #cac4bb;
+    --tertiary-fixed: #ffddb3;
+    --on-tertiary-fixed-variant: #6b5840;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--surface);
+    color: var(--on-surface);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  img { max-width: 100%; display: block; }
+  a { color: inherit; text-decoration: none; }
+
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    vertical-align: middle;
+  }
+
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+  h1, h2, h3, h4 { font-weight: 600; letter-spacing: -0.01em; }
+
+  .bg-forest { background-color: var(--primary) !important; }
+  .bg-forest-container { background-color: var(--secondary-container) !important; }
+  .bg-surface-container { background-color: var(--surface-container) !important; }
+  .bg-surface-container-low { background-color: var(--surface-container-low) !important; }
+  .text-forest { color: var(--primary) !important; }
+  .text-forest-secondary { color: var(--secondary) !important; }
+  .text-on-surface-variant { color: var(--on-surface-variant) !important; }
+  .text-secondary-fixed { color: var(--secondary-fixed) !important; }
+  .border-forest { border-color: var(--primary) !important; }
+  .rounded-4 { border-radius: 1.25rem !important; }
+  .rounded-5 { border-radius: 1.75rem !important; }
+
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12.5px; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--secondary);
+    margin-bottom: 10px;
+  }
+  .eyebrow .material-symbols-outlined { font-size: 16px; }
+
+  /* ---- photo tile ---- */
+  .tile {
+    border-radius: 1.25rem;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    min-height: 160px; padding: 18px;
+    color: #fff; position: relative; overflow: hidden;
+  }
+  .tile img {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: cover; z-index: 0; transition: transform .5s ease;
+  }
+  .tile:hover img { transform: scale(1.06); }
+  .tile::before {
+    content: ''; position: absolute; inset: 0; z-index: 1;
+    background: linear-gradient(to top, rgba(0,0,0,.65) 0%, rgba(0,0,0,.15) 55%, rgba(0,0,0,0) 100%);
+  }
+  .tile .material-symbols-outlined.icon-lg {
+    position: absolute; top: 16px; right: 16px; z-index: 2;
+    font-size: 30px; opacity: 0.95; text-shadow: 0 1px 4px rgba(0,0,0,.4);
+  }
+  .tile .tile-label { position: relative; z-index: 2; font-size: 13.5px; font-weight: 500; }
+  .tile.forest { background: var(--primary); }
+  .tile.leaf   { background: var(--secondary); }
+  .tile.durian { background: var(--on-tertiary-fixed-variant); }
+  .tile.wheat  { background: #8a8f3a; }
+  .tile.sand   { background: var(--outline-variant); color: var(--on-surface); }
+
+  /* ---- destination thumbnail ---- */
+  .dest-media { display: flex; flex-direction: column; gap: 10px; }
+  .dest-media img {
+    width: 100%; height: 120px; object-fit: cover; border-radius: .85rem;
+  }
+
+  /* ---- nav ---- */
+  header.site-nav {
+    position: sticky; top: 0; z-index: 50;
+    background: var(--primary);
+  }
+  .nav-inner {
+    max-width: 1080px; margin: 0 auto; padding: 16px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .brand {
+    color: #fff; font-size: 17px; font-weight: 600;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .nav-links { display: flex; gap: 24px; list-style: none; }
+  .nav-links a {
+    color: #fff; opacity: 0.8; font-size: 14px; font-weight: 500;
+  }
+  .nav-links a:hover { opacity: 1; }
+  @media (max-width: 760px) { .nav-links { display: none; } }
+
+  /* ---- hero ---- */
+  .hero {
+    position: relative; overflow: hidden;
+    background: var(--primary); color: #fff; padding: 88px 0 72px;
+  }
+  .hero-bg {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0;
+  }
+  .hero::before {
+    content: ''; position: absolute; inset: 0; z-index: 1;
+    background: linear-gradient(120deg, rgba(13,61,26,.94) 0%, rgba(13,61,26,.82) 45%, rgba(13,61,26,.55) 100%);
+  }
+  .hero .wrap { position: relative; z-index: 2; }
+  .hero h1 { font-size: clamp(30px, 4.6vw, 44px); line-height: 1.15; margin-bottom: 16px; }
+  .hero h1 span { color: var(--secondary-fixed); }
+  .hero p.lede { font-size: 16px; color: #dfe6df; max-width: 52ch; margin-bottom: 28px; }
+  .hero-chips { display: flex; flex-wrap: wrap; gap: 10px; }
+  .chip {
+    background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 999px; padding: 8px 16px; font-size: 13.5px; font-weight: 500;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .chip .material-symbols-outlined { font-size: 16px; color: var(--secondary-fixed); }
+
+  /* ---- section shell ---- */
+  section { padding: 64px 0; }
+  .section-head { max-width: 620px; margin-bottom: 36px; }
+  .section-head h2 { font-size: 28px; color: var(--primary); margin-bottom: 8px; }
+  .section-head p { color: var(--on-surface-variant); font-size: 15.5px; }
+
+  /* ---- tentang ---- */
+  .about-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 40px; align-items: start; }
+  .about-grid p { color: var(--on-surface); font-size: 15.5px; margin-bottom: 14px; max-width: 56ch; }
+  .fact-card {
+    background: var(--surface-container-low); border: 1px solid var(--outline-variant);
+    border-radius: 1.25rem; padding: 8px 20px;
+  }
+  .fact-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 0; border-bottom: 1px solid var(--outline-variant);
+  }
+  .fact-item:last-child { border-bottom: none; }
+  .fact-item b { font-size: 15px; color: var(--primary); }
+  .fact-item span { font-size: 12px; color: var(--on-surface-variant); }
+
+  /* ---- komoditas / grid cards ---- */
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  .card {
+    background: #fff; border: 1px solid var(--outline-variant);
+    border-radius: 1.25rem; overflow: hidden;
+  }
+  .card .card-body { padding: 22px; }
+  .card h4 { font-size: 18px; color: var(--primary); margin-bottom: 8px; }
+  .card p { font-size: 14.5px; color: var(--on-surface-variant); }
+
+  .highlight-panel {
+    background: var(--secondary-container); border-radius: 1.75rem;
+    padding: 20px; display: grid; grid-template-columns: 160px 1fr; gap: 24px; align-items: center;
+  }
+  .highlight-panel img { width: 100%; height: 140px; object-fit: cover; border-radius: 1.25rem; }
+  .highlight-panel h4 { color: var(--primary); font-size: 18px; margin-bottom: 6px; }
+  .highlight-panel p { color: var(--on-surface-variant); font-size: 14.5px; }
+  @media (max-width: 560px) { .highlight-panel { grid-template-columns: 1fr; } .highlight-panel img { height: 180px; } }
+
+  /* ---- galeri (icon tiles, simple) ---- */
+  .gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .gallery-grid .tile { min-height: 130px; }
+  @media (max-width: 700px) { .gallery-grid { grid-template-columns: repeat(2, 1fr); } }
+
+  /* ---- wisata tiers ---- */
+  .tier { margin-bottom: 40px; }
+  .tier-head { display: flex; align-items: center; gap: 14px; margin-bottom: 4px; }
+  .tier-badge {
+    font-weight: 700; font-size: 16px; width: 38px; height: 38px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0;
+  }
+  .tier-1 .tier-badge { background: var(--primary); }
+  .tier-2 .tier-badge { background: var(--secondary); }
+  .tier-3 .tier-badge { background: var(--on-tertiary-fixed-variant); }
+  .tier-title { font-size: 18px; color: var(--primary); font-weight: 600; }
+  .tier-sub { font-size: 12.5px; color: var(--on-surface-variant); margin: 4px 0 20px 52px; }
+
+  .dest-cards { display: flex; flex-direction: column; gap: 14px; }
+  .dest-card {
+    background: var(--surface-container-low); border-left: 4px solid var(--primary);
+    border-radius: 1rem; padding: 18px 22px;
+    display: grid; grid-template-columns: 170px 1fr 1fr; gap: 20px; align-items: start;
+  }
+  .tier-2 .dest-card { border-left-color: var(--secondary); }
+  .tier-3 .dest-card { border-left-color: var(--on-tertiary-fixed-variant); }
+  .dest-name { font-weight: 600; color: var(--primary); font-size: 15.5px; }
+  .dest-col-label {
+    display: block; font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.05em; color: var(--on-surface-variant); margin-bottom: 4px;
+  }
+  .dest-col p { font-size: 14px; color: var(--on-surface); }
+  @media (max-width: 760px) { .dest-card { grid-template-columns: 1fr; } }
+
+  /* ---- saran umum ---- */
+  .saran-panel { background: var(--primary); color: #fff; border-radius: 1.75rem; padding: 40px; }
+  .saran-panel h3 { font-size: 22px; margin-bottom: 6px; }
+  .saran-panel > p { color: #cfe0d0; max-width: 56ch; margin-bottom: 26px; font-size: 14.5px; }
+  .saran-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 32px; }
+  .saran-item {
+    display: flex; gap: 12px; align-items: flex-start; padding: 12px 0;
+    border-top: 1px solid rgba(255,255,255,0.15);
+  }
+  .saran-item .material-symbols-outlined { font-size: 18px; color: var(--secondary-fixed); margin-top: 2px; }
+  .saran-item p { font-size: 14px; color: #eaf0ea; }
+  @media (max-width: 700px) { .saran-grid { grid-template-columns: 1fr; } .saran-panel { padding: 26px; } }
+
+  /* ---- footer ---- */
+  footer { background: #0a2a13; color: #b7c7b8; padding: 40px 0 24px; }
+  .footer-top { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; }
+  .footer-brand { color: #fff; font-size: 17px; font-weight: 600; }
+  .footer-note { font-size: 13px; max-width: 40ch; }
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.1); padding-top: 16px;
+    font-size: 12px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  }
+
+  /* ---- responsive ---- */
+  @media (max-width: 820px) {
+    .about-grid { grid-template-columns: 1fr; }
+    .card-grid { grid-template-columns: 1fr; }
+    section { padding: 48px 0; }
+  }
+
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--secondary); outline-offset: 3px; }
+</style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<header class="site-nav">
+  <div class="nav-inner">
+    <div class="brand"><span class="material-symbols-outlined">forest</span> Agrowisata Desa Ujungberung</div>
+    <nav>
+      <ul class="nav-links">
+        <li><a href="#tentang">Tentang</a></li>
+        <li><a href="#komoditas">Komoditas</a></li>
+        <li><a href="#pertanian">Pertanian</a></li>
+        <li><a href="#hutan">Hutan Alam</a></li>
+        <li><a href="#galeri">Galeri</a></li>
+        <li><a href="#wisata">Wisata</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="beranda">
+  <img class="hero-bg" src="images/cover_website.JPG" alt="Panorama Desa Ujungberung">
+  <div class="wrap">
+    <div class="eyebrow" style="color:var(--secondary-fixed);"><span class="material-symbols-outlined">eco</span> Profil Agro Desa</div>
+    <h1>Ujungberung, <span>tanah subur</span> di kaki hutan alam.</h1>
+    <p class="lede">Sawah, kebun durian, kebun alpukat, dan tebu tumbuh berdampingan dengan kawasan hutan alam yang masih terjaga — menopang mata pencaharian warga sekaligus kelestarian lingkungan.</p>
+    <div class="hero-chips">
+      <span class="chip"><span class="material-symbols-outlined">nutrition</span> Durian — Komoditas Unggulan</span>
+      <span class="chip"><span class="material-symbols-outlined">grass</span> Padi &amp; Tebu — Pertanian</span>
+      <span class="chip"><span class="material-symbols-outlined">park</span> Alpukat — Kehutanan MPTS</span>
+      <span class="chip"><span class="material-symbols-outlined">forest</span> Hutan Alam — Konservasi</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TENTANG ============ -->
+<section id="tentang">
+  <div class="wrap">
+    <div class="about-grid">
+      <div>
+        <div class="eyebrow"><span class="material-symbols-outlined">info</span> Tentang Agro Desa</div>
+        <h2 style="font-size:26px; color:var(--primary); margin-bottom:16px;">Alam yang subur, mata pencaharian yang beragam.</h2>
+        <p>Desa Ujungberung memiliki potensi agro yang didukung oleh kondisi alam yang subur serta bentang alam yang didominasi oleh kawasan pertanian dan kehutanan. Potensi tersebut menjadi salah satu sumber mata pencaharian masyarakat sekaligus berperan dalam menjaga kelestarian lingkungan.</p>
+        <p>Sektor pertanian berkembang melalui budidaya padi dan tebu, sedangkan sektor kehutanan didukung oleh tanaman Multi Purpose Tree Species (MPTS) seperti durian dan alpukat. Desa ini juga masih memiliki kawasan hutan alam yang relatif luas dan terjaga.</p>
+      </div>
+      <div class="fact-card">
+        <div class="fact-item"><b>Padi</b><span>PERTANIAN · PANGAN</span></div>
+        <div class="fact-item"><b>Tebu</b><span>PERTANIAN · EKONOMI</span></div>
+        <div class="fact-item"><b>Durian</b><span>MPTS · IKON DESA</span></div>
+        <div class="fact-item"><b>Alpukat</b><span>MPTS · KEHUTANAN</span></div>
+        <div class="fact-item"><b>Hutan Alam</b><span>KONSERVASI · AIR</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ KOMODITAS UNGGULAN — DURIAN ============ -->
+<section class="bg-surface-container" id="komoditas">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow"><span class="material-symbols-outlined">nutrition</span> Komoditas Unggulan</div>
+      <h2>Durian</h2>
+    </div>
+    <div class="highlight-panel" style="margin-bottom:24px;">
+      <img src="images/DSCF5925.JPG" alt="Kebun durian warga Ujungberung">
+      <div>
+        <h4>Ikon Agro Desa Ujungberung</h4>
+        <p>Durian dibudidayakan warga sebagai bagian dari sistem Multi Purpose Tree Species (MPTS) dan menjadi identitas sektor agro desa dengan nilai ekonomi tinggi, terutama saat musim panen.</p>
+      </div>
+    </div>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-body">
+          <h4>Nilai Ekonomi</h4>
+          <p>Durian merupakan komoditas unggulan yang memiliki nilai ekonomi tinggi dan berkontribusi besar pada perekonomian masyarakat, terutama saat musim panen.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <h4>Manfaat Lingkungan</h4>
+          <p>Tanaman durian berperan menjaga tutupan lahan dan meningkatkan resapan air, mendukung keseimbangan ekosistem di sekitar kebun.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ KEHUTANAN MPTS — ALPUKAT ============ -->
+<section id="kehutanan">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow"><span class="material-symbols-outlined">park</span> Kehutanan MPTS</div>
+      <h2>Kebun Alpukat</h2>
+    </div>
+    <div class="card-grid">
+      <div class="tile leaf" style="min-height:200px;">
+        <img src="images/DSC02662.JPG" alt="Kebun alpukat milik warga">
+        <span class="material-symbols-outlined icon-lg">park</span>
+        <span class="tile-label">Kebun alpukat milik warga</span>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <p>Selain durian, sebagian masyarakat Desa Ujungberung membudidayakan tanaman alpukat sebagai bagian dari sistem MPTS. Tanaman ini memberi manfaat ekonomi lewat hasil panen sekaligus menjaga tutupan vegetasi dan kualitas lingkungan.</p>
+          <p style="margin-top:12px;">Keberadaan kebun alpukat menunjukkan pemanfaatan lahan yang produktif sekaligus mendukung pengelolaan sumber daya alam secara berkelanjutan.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PERTANIAN — PADI & TEBU ============ -->
+<section class="bg-surface-container" id="pertanian">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow"><span class="material-symbols-outlined">grass</span> Pertanian</div>
+      <h2>Padi &amp; Tebu</h2>
+      <p>Dua komoditas utama yang menopang ketahanan pangan sekaligus pendapatan petani Ujungberung.</p>
+    </div>
+    <div class="card-grid">
+      <div class="card">
+        <div class="tile wheat"><img src="images/DSC03533.JPG" alt="Hamparan persawahan"><span class="material-symbols-outlined icon-lg">grass</span><span class="tile-label">Hamparan persawahan</span></div>
+        <div class="card-body">
+          <h4>Padi</h4>
+          <p>Komoditas pertanian utama, sumber pangan sekaligus mata pencaharian sebagian masyarakat. Kondisi lahan subur mendukung budidaya padi yang dilakukan turun-temurun.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="tile sand"><img src="images/DSCF5949.JPG" alt="Lahan tanaman tebu"><span class="material-symbols-outlined icon-lg">eco</span><span class="tile-label">Lahan tanaman tebu</span></div>
+        <div class="card-body">
+          <h4>Tebu</h4>
+          <p>Komoditas pertanian dengan nilai ekonomi tambahan bagi petani. Budidaya tebu memiliki potensi untuk terus dikembangkan sebagai bagian dari penguatan sektor pertanian desa.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HUTAN ALAM ============ -->
+<section id="hutan">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow"><span class="material-symbols-outlined">forest</span> Hutan Alam</div>
+      <h2>Penyangga Kehidupan Desa</h2>
+    </div>
+    <div class="tile forest" style="min-height:280px; margin-bottom:24px;">
+      <img src="images/DSC03502.JPG" alt="Kawasan hutan alam Desa Ujungberung">
+      <span class="material-symbols-outlined icon-lg">forest</span>
+      <span class="tile-label">Kawasan hutan alam Desa Ujungberung</span>
+    </div>
+    <p style="max-width:70ch; margin-bottom:12px; font-size:15.5px;">Desa Ujungberung masih memiliki kawasan hutan alam yang cukup luas dan sebagian besar belum dimanfaatkan secara optimal. Kawasan ini menjaga ketersediaan sumber air, melindungi keanekaragaman hayati, serta membantu mengurangi potensi erosi dan longsor.</p>
+    <p style="max-width:70ch; font-size:15.5px;">Keberadaan hutan alam menjadi potensi yang dapat dikembangkan secara bijaksana sebagai kawasan konservasi, edukasi lingkungan, maupun wisata berbasis alam — dengan tetap mengutamakan kelestarian ekosistem.</p>
+  </div>
+</section>
+
+<!-- ============ GALERI ============ -->
+<section class="bg-surface-container" id="galeri">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow"><span class="material-symbols-outlined">photo_camera</span> Dokumentasi</div>
+      <h2>Galeri Agro</h2>
+    </div>
+    <div class="gallery-grid">
+      <div class="tile forest"><img src="images/DSC02919.JPG" alt="Panorama desa"><span class="material-symbols-outlined icon-lg">forest</span><span class="tile-label">Panorama desa</span></div>
+      <div class="tile durian"><img src="images/DSC01511.JPG" alt="Kebun durian"><span class="material-symbols-outlined icon-lg">nutrition</span><span class="tile-label">Kebun durian</span></div>
+      <div class="tile leaf"><img src="images/DSC02626.JPG" alt="Kebun alpukat"><span class="material-symbols-outlined icon-lg">park</span><span class="tile-label">Kebun alpukat</span></div>
+      <div class="tile wheat"><img src="images/DSC02662.JPG" alt="Hamparan sawah"><span class="material-symbols-outlined icon-lg">grass</span><span class="tile-label">Hamparan sawah</span></div>
+      <div class="tile sand"><img src="images/DSC02888.JPG" alt="Lahan tebu"><span class="material-symbols-outlined icon-lg">eco</span><span class="tile-label">Lahan tebu</span></div>
+      <div class="tile forest"><img src="images/DSC03497.JPG" alt="Kawasan hutan"><span class="material-symbols-outlined icon-lg">forest</span><span class="tile-label">Kawasan hutan</span></div>
+      <div class="tile durian"><img src="images/DSC02930.JPG" alt="Aktivitas petani"><span class="material-symbols-outlined icon-lg">groups</span><span class="tile-label">Aktivitas petani</span></div>
+      <div class="tile leaf"><img src="images/DSC02931.JPG" alt="Panen durian"><span class="material-symbols-outlined icon-lg">groups</span><span class="tile-label">Panen durian</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PENGEMBANGAN WISATA DESA ============ -->
+<section id="wisata">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow"><span class="material-symbols-outlined">map</span> Rencana Pengembangan</div>
+      <h2>Pengembangan Wisata Desa</h2>
+      <p>Berdasarkan observasi lapangan, wawancara, dan inventarisasi potensi wisata, pengembangan destinasi disarankan berjalan bertahap sesuai tingkat kesiapan tiap lokasi.</p>
+    </div>
+
+    <!-- Prioritas I -->
+    <div class="tier tier-1">
+      <div class="tier-head">
+        <div class="tier-badge">I</div>
+        <div class="tier-title">Prioritas I — Jangka Pendek</div>
+      </div>
+      <div class="tier-sub">Destinasi yang siap dikembangkan</div>
+      <div class="dest-cards">
+        <div class="dest-card">
+          <div class="dest-media">
+            <img src="images/pondokdurian.jpeg" alt="Agrowisata Kebun Durian Ibu Titin Heri">
+            <div class="dest-name">Agrowisata Kebun Durian<br>Ibu Titin Heri</div>
+          </div>
+          <div class="dest-col"><span class="dest-col-label">Alasan Prioritas</span><p>Kondisi kebun telah tertata dengan baik dan berpotensi sebagai destinasi unggulan.</p></div>
+          <div class="dest-col"><span class="dest-col-label">Saran Tindak Lanjut</span><p>Menetapkan sebagai destinasi percontohan, memperkuat promosi lewat website desa, membangun kerja sama Pemerintah Desa, Karang Taruna, masyarakat, dan pemilik kebun.</p></div>
+        </div>
+        <div class="dest-card">
+          <div class="dest-media">
+            <img src="images/safehouse.JPG" alt="Safe House">
+            <div class="dest-name">Safe House</div>
+          </div>
+          <div class="dest-col"><span class="dest-col-label">Alasan Prioritas</span><p>Fasilitas sudah memadai namun belum dikenal secara luas.</p></div>
+          <div class="dest-col"><span class="dest-col-label">Saran Tindak Lanjut</span><p>Meningkatkan promosi, memasang papan petunjuk arah, memperbaiki akses jalan, memasukkan ke paket wisata desa.</p></div>
+        </div>
+        <div class="dest-card">
+          <div class="dest-media">
+            <img src="images/bukitperwira.jpg" alt="Bukit Perwira Cafe & Resto">
+            <div class="dest-name">Bukit Perwira Cafe &amp; Resto</div>
+          </div>
+          <div class="dest-col"><span class="dest-col-label">Alasan Prioritas</span><p>Fasilitas dan daya tarik sudah tersedia sehingga siap menerima pengunjung.</p></div>
+          <div class="dest-col"><span class="dest-col-label">Saran Tindak Lanjut</span><p>Meningkatkan promosi, memperbaiki aksesibilitas, memasang papan informasi, kolaborasi dengan Pemerintah Desa.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Prioritas II -->
+    <div class="tier tier-2">
+      <div class="tier-head">
+        <div class="tier-badge">II</div>
+        <div class="tier-title">Prioritas II — Jangka Menengah</div>
+      </div>
+      <div class="tier-sub">Destinasi yang memerlukan peningkatan akses &amp; fasilitas</div>
+      <div class="dest-cards">
+        <div class="dest-card">
+          <div class="dest-media">
+            <img src="images/DSC02626.JPG" alt="Agrowisata Kebun Durian Bapak Harijadi">
+            <div class="dest-name">Agrowisata Kebun Durian<br>Bapak Harijadi</div>
+          </div>
+          <div class="dest-col"><span class="dest-col-label">Alasan Prioritas</span><p>Potensi wisata cukup baik, namun akses jalan dan fasilitas pendukung masih perlu ditingkatkan.</p></div>
+          <div class="dest-col"><span class="dest-col-label">Saran Tindak Lanjut</span><p>Memperbaiki akses jalan, menyediakan sarana dasar, memperkuat koordinasi pemilik kebun, Pemerintah Desa, Karang Taruna, dan masyarakat.</p></div>
+        </div>
+        <div class="dest-card">
+          <div class="dest-media">
+            <img src="images/pakiding.jpg" alt="Agrowisata Kebun Durian Kang Iding Sardi">
+            <div class="dest-name">Agrowisata Kebun Durian<br>Kang Iding Sardi</div>
+          </div>
+          <div class="dest-col"><span class="dest-col-label">Alasan Prioritas</span><p>Kondisi kebun sudah memadai, namun aksesibilitas menuju lokasi masih menjadi kendala.</p></div>
+          <div class="dest-col"><span class="dest-col-label">Saran Tindak Lanjut</span><p>Meningkatkan kualitas jalan, memasang papan petunjuk arah, mengembangkan promosi sebagai bagian agrowisata desa.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Prioritas III -->
+    <div class="tier tier-3">
+      <div class="tier-head">
+        <div class="tier-badge">III</div>
+        <div class="tier-title">Prioritas III — Jangka Panjang</div>
+      </div>
+      <div class="tier-sub">Destinasi yang memerlukan kajian &amp; perencanaan lanjut</div>
+      <div class="dest-cards">
+        <div class="dest-card">
+          <div class="dest-media">
+            <img src="images/gunungjajar.jpg" alt="Gunung Jajar">
+            <div class="dest-name">Gunung Jajar</div>
+          </div>
+          <div class="dest-col"><span class="dest-col-label">Alasan Prioritas</span><p>Belum beroperasi aktif, perlu kajian potensi, keamanan, serta status pengelolaan kawasan.</p></div>
+          <div class="dest-col"><span class="dest-col-label">Saran Tindak Lanjut</span><p>Studi kelayakan, koordinasi dengan pihak terkait, penyusunan konsep pengembangan bila dinilai layak.</p></div>
+        </div>
+        <div class="dest-card">
+          <div class="dest-media">
+            <img src="images/.JPG" alt="Gunung Putri">
+            <div class="dest-name">Gunung Putri</div>
+          </div>
+          <div class="dest-col"><span class="dest-col-label">Alasan Prioritas</span><p>Belum beroperasi aktif dan belum memiliki sistem pengelolaan yang jelas.</p></div>
+          <div class="dest-col"><span class="dest-col-label">Saran Tindak Lanjut</span><p>Identifikasi potensi kawasan, koordinasi lintas pihak, penyusunan rencana berbasis konservasi.</p></div>
+        </div>
+        <div class="dest-card">
+          <div class="dest-media">
+            <img src="images/.JPG" alt="Gunung Kandaga">
+            <div class="dest-name">Gunung Kandaga</div>
+          </div>
+          <div class="dest-col"><span class="dest-col-label">Alasan Prioritas</span><p>Memiliki potensi wisata alam, namun akses, sarana prasarana, dan pengelolaan masih perlu penataan.</p></div>
+          <div class="dest-col"><span class="dest-col-label">Saran Tindak Lanjut</span><p>Menyusun masterplan pengembangan, meningkatkan aksesibilitas, melengkapi fasilitas pendukung bertahap.</p></div>
+        </div>
+        <div class="dest-card">
+          <div class="dest-media">
+            <img src="images/tebingkandaga.JPG" alt="Tebing Kandaga">
+            <div class="dest-name">Tebing Kandaga</div>
+          </div>
+          <div class="dest-col"><span class="dest-col-label">Alasan Prioritas</span><p>Memerlukan kajian keamanan dan pengelolaan sebelum dibuka kembali sebagai destinasi wisata.</p></div>
+          <div class="dest-col"><span class="dest-col-label">Saran Tindak Lanjut</span><p>Penilaian risiko, penyusunan konsep wisata yang aman, koordinasi dengan seluruh pemangku kepentingan.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SARAN UMUM ============ -->
+<section style="padding-top:0;">
+  <div class="wrap">
+    <div class="saran-panel">
+      <h3>Saran Umum Pengembangan</h3>
+      <p>Selain pengembangan tiap destinasi, hal-hal berikut disarankan menjadi perhatian bersama agar pengelolaan wisata desa berjalan optimal.</p>
+      <div class="saran-grid">
+        <div class="saran-item"><span class="material-symbols-outlined">check_circle</span><p>Menyusun rencana induk (masterplan) pengembangan wisata desa sebagai acuan jangka pendek, menengah, dan panjang.</p></div>
+        <div class="saran-item"><span class="material-symbols-outlined">check_circle</span><p>Meningkatkan kualitas akses jalan menuju seluruh destinasi wisata agar mudah dijangkau pengunjung.</p></div>
+        <div class="saran-item"><span class="material-symbols-outlined">check_circle</span><p>Menyediakan penerangan jalan pada jalur menuju lokasi wisata untuk keamanan dan kenyamanan.</p></div>
+        <div class="saran-item"><span class="material-symbols-outlined">check_circle</span><p>Melengkapi sarana dasar: papan petunjuk arah, papan informasi, parkir, tempat sampah, toilet, musala, gazebo, dan air bersih.</p></div>
+        <div class="saran-item"><span class="material-symbols-outlined">check_circle</span><p>Menjaga kebersihan dan kelestarian lingkungan lewat gotong royong rutin serta edukasi masyarakat dan pengunjung.</p></div>
+        <div class="saran-item"><span class="material-symbols-outlined">check_circle</span><p>Memperkuat sinergi Pemerintah Desa, Karang Taruna, masyarakat, pengelola destinasi, dan pihak terkait.</p></div>
+        <div class="saran-item"><span class="material-symbols-outlined">check_circle</span><p>Mengoptimalkan website desa dan media sosial sebagai media promosi resmi.</p></div>
+        <div class="saran-item"><span class="material-symbols-outlined">check_circle</span><p>Mengembangkan paket wisata terpadu: agrowisata, wisata alam, dan kuliner lokal.</p></div>
+        <div class="saran-item"><span class="material-symbols-outlined">check_circle</span><p>Melakukan monitoring dan evaluasi berkala agar program sesuai kebutuhan lapangan.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap">
+    <div class="footer-top">
+      <div>
+        <div class="footer-brand">Agrowisata Desa Ujungberung</div>
+        <p class="footer-note" style="margin-top:6px;">Potensi pertanian dan kehutanan sebagai penopang ekonomi warga dan kelestarian lingkungan desa.</p>
+      </div>
+      <div class="footer-note">Durian · Alpukat · Padi · Tebu · Hutan Alam</div>
+    </div>
+    <div class="footer-bottom">
+      <span>© Pemerintah Desa Ujungberung</span>
+      <span>Profil Agro &amp; Rencana Pengembangan Wisata</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // fallback halus kalau path foto belum sesuai nama file di folder images/
+  document.querySelectorAll('img').forEach(function (img) {
+    img.addEventListener('error', function () {
+      this.style.display = 'none';
+    });
+  });
+</script>
+</body>
+</html>

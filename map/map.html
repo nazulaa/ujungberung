@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Peta Interaktif Desa Ujungberung</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    :root{
+      --forest-950:#0a2913;
+      --forest-900:#0d3d1a;
+      --forest-700:#1b5e20;
+      --forest-600:#256b2b;
+      --forest-500:#2e7d32;
+      --forest-300:#7bb883;
+      --moss-100:#e9f1e6;
+      --accent-gold:#e8a13d;
+      --accent-gold-dark:#c9860f;
+      --clay:#c96a4f;
+      --bg-soft:#f6f5ef;
+      --ink:#1c2a1d;
+      --ink-soft:#5a6b5a;
+      --glass-bg:rgba(255,255,255,0.78);
+      --glass-border:rgba(255,255,255,0.5);
+      --radius-lg:20px;
+      --radius-md:14px;
+      --radius-sm:10px;
+      --shadow-soft:0 10px 24px rgba(20,40,20,0.08);
+      --shadow-lift:0 18px 34px rgba(20,40,20,0.14);
+    }
+
+    *{ font-family:'Manrope', sans-serif; box-sizing:border-box; }
+    h1,h2,h3,h4,h5,h6,.font-display{ font-family:'Fraunces', serif; letter-spacing:-0.01em; }
+
+    body{
+      background:
+        radial-gradient(ellipse 900px 500px at 8% -5%, rgba(46,125,50,0.10), transparent 55%),
+        radial-gradient(ellipse 700px 500px at 96% 10%, rgba(232,161,61,0.12), transparent 50%),
+        var(--bg-soft);
+      color:var(--ink);
+      min-height:100vh;
+    }
+
+    ::selection{ background:var(--accent-gold); color:#1c2a1d; }
+
+    .page-shell{ max-width:1320px; }
+
+    /* ===== TOPBAR (kompak, bukan hero besar) ===== */
+    .topbar{
+      position:relative;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      background:linear-gradient(120deg, var(--forest-950), var(--forest-700) 65%, var(--forest-600));
+      color:#fff;
+      border-radius:16px;
+      padding:14px 20px;
+      box-shadow:var(--shadow-lift);
+      overflow:hidden;
+    }
+    .topbar::after{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        radial-gradient(circle at 92% -20%, rgba(232,161,61,0.28), transparent 40%),
+        repeating-linear-gradient(115deg, rgba(255,255,255,0.035) 0 2px, transparent 2px 34px);
+      pointer-events:none;
+    }
+    .topbar-left{ display:flex; align-items:center; gap:14px; position:relative; z-index:1; min-width:0; }
+    .topbar-mark{
+      width:42px; height:42px; flex:0 0 auto; border-radius:12px;
+      background:linear-gradient(150deg, var(--accent-gold), var(--accent-gold-dark));
+      display:flex; align-items:center; justify-content:center;
+      color:#2a1d05; font-size:1.05rem;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,0.25);
+    }
+    .topbar-title{ min-width:0; }
+    .topbar-title .eyebrow{
+      display:block; font-size:0.66rem; font-weight:700; letter-spacing:0.14em;
+      text-transform:uppercase; color:rgba(255,255,255,0.62); margin-bottom:1px;
+    }
+    .topbar-title h1{
+      font-size:1.28rem; font-weight:600; line-height:1.15; margin:0;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .topbar-title p{
+      margin:2px 0 0; font-size:0.78rem; color:rgba(255,255,255,0.72);
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:380px;
+    }
+    .btn-back{
+      position:relative; z-index:1;
+      background:rgba(255,255,255,0.12);
+      color:#fff; font-weight:600; font-size:0.85rem;
+      border:1px solid rgba(255,255,255,0.28);
+      border-radius:999px; padding:9px 16px 9px 14px;
+      display:inline-flex; align-items:center; gap:7px;
+      white-space:nowrap;
+      backdrop-filter:blur(6px);
+      transition:.2s ease;
+      text-decoration:none;
+    }
+    .btn-back:hover{ background:var(--accent-gold); color:#241a00; border-color:var(--accent-gold); transform:translateY(-1px); }
+
+    /* ===== MAP SHELL ===== */
+    .map-shell{
+      position:relative;
+      border-radius:var(--radius-lg);
+      overflow:hidden;
+      box-shadow:var(--shadow-lift);
+      border:1px solid rgba(46,125,50,0.14);
+      background:#fff;
+    }
+    .map-shell-tag{
+      position:absolute; top:14px; left:14px; z-index:500;
+      background:var(--glass-bg);
+      backdrop-filter:blur(10px);
+      border:1px solid var(--glass-border);
+      border-radius:999px;
+      padding:6px 13px;
+      font-size:0.72rem; font-weight:700; color:var(--forest-700);
+      box-shadow:var(--shadow-soft);
+      display:flex; align-items:center; gap:6px;
+      pointer-events:none;
+    }
+    .map-shell-tag i{ color:var(--accent-gold-dark); }
+    #map{
+      height:70vh;
+      min-height:520px;
+      width:100%;
+      background:#eef1e8;
+    }
+
+    /* ===== FLOATING CONTROL PANEL ===== */
+    .layer-panel{
+      position:sticky;
+      top:1.2rem;
+      background:rgba(255,255,255,0.97);
+      backdrop-filter:blur(18px);
+      -webkit-backdrop-filter:blur(18px);
+      border:1px solid rgba(46,125,50,0.14);
+      border-radius:var(--radius-lg);
+      box-shadow:var(--shadow-lift);
+      overflow:hidden;
+    }
+    .layer-panel-head{
+      background:linear-gradient(120deg, var(--forest-700), var(--forest-500));
+      color:#fff;
+      padding:15px 18px;
+      display:flex;
+      align-items:center;
+      gap:11px;
+      position:relative;
+      overflow:hidden;
+    }
+    .layer-panel-head::after{
+      content:""; position:absolute; inset:0;
+      background:radial-gradient(circle at 100% 0%, rgba(232,161,61,0.3), transparent 55%);
+    }
+    .layer-panel-head i{ position:relative; z-index:1; font-size:0.95rem; opacity:0.9; }
+    .layer-panel-head .fw-bold{ position:relative; z-index:1; font-family:'Fraunces',serif; font-size:1rem; font-weight:600; }
+    .layer-panel-head div span, .layer-panel-head div div:last-child{ position:relative; z-index:1; }
+    .layer-panel-body{ padding:16px 16px 18px; }
+
+    .layer-item{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+      padding:11px 12px;
+      border-radius:14px;
+      transition:.2s ease;
+      cursor:pointer;
+      opacity:0.68;
+      border:1px solid rgba(46,125,50,0.09);
+      background:#fff;
+    }
+    .layer-item.active{
+      opacity:1;
+      background:var(--moss-100);
+      border-color:rgba(46,125,50,0.22);
+    }
+    .layer-item:hover{ border-color:rgba(46,125,50,0.3); }
+    .layer-item.locked{ cursor:default; opacity:1; }
+
+    .layer-item-left{ display:flex; align-items:center; gap:10px; }
+    .layer-icon{
+      width:36px; height:36px; border-radius:11px;
+      display:flex; align-items:center; justify-content:center;
+      color:#fff; font-size:0.92rem; flex:0 0 auto;
+      box-shadow:0 5px 12px rgba(0,0,0,0.16);
+    }
+    .layer-label{ font-weight:700; font-size:0.88rem; line-height:1.2; color:var(--ink); }
+    .layer-sub{ font-size:0.71rem; color:var(--ink-soft); margin-top:1px; }
+
+    /* toggle switch */
+    .switch{ position:relative; width:40px; height:23px; flex:0 0 auto; margin-top:2px; }
+    .switch input{ opacity:0; width:0; height:0; }
+    .slider{
+      position:absolute; cursor:pointer; inset:0;
+      background:#d6ddd0; border-radius:999px; transition:.25s;
+    }
+    .slider::before{
+      content:""; position:absolute; height:17px; width:17px;
+      left:3px; top:3px; background:#fff; border-radius:50%; transition:.25s;
+      box-shadow:0 2px 4px rgba(0,0,0,0.25);
+    }
+    .switch input:checked + .slider{ background:var(--forest-500); }
+    .switch input:checked + .slider::before{ transform:translateX(17px); }
+    .switch.locked .slider{ background:var(--forest-500); cursor:default; }
+    .switch.locked .slider::before{ transform:translateX(17px); }
+
+    /* mini legend under a Kelas-based layer */
+    .mini-legend{
+      display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; padding-left:46px;
+    }
+    .mini-chip{
+      display:flex; align-items:center; gap:5px;
+      font-size:0.66rem; font-weight:700; color:var(--ink-soft);
+      background:#fff; border:1px solid rgba(46,125,50,0.1); border-radius:999px; padding:3px 9px;
+    }
+    .mini-dot{ width:8px; height:8px; border-radius:50%; }
+
+    hr.divider{ border-top:1px dashed #d5ddcf; margin:12px 0; }
+
+    /* ===== popup styling ===== */
+    .leaflet-popup-content-wrapper{ border-radius:16px; overflow:hidden; border:1px solid rgba(46,125,50,0.18); box-shadow:0 16px 28px rgba(0,0,0,0.16); }
+    .popup-card{ font-family:'Manrope',sans-serif; min-width:190px; }
+    .popup-card img{ width:100%; height:140px; object-fit:cover; display:block; border-bottom:1px solid rgba(0,0,0,0.08); }
+    .popup-title{ font-family:'Fraunces',serif; font-weight:600; font-size:0.96rem; color:var(--forest-900); margin:10px 10px 4px; }
+    .popup-tag{ font-size:0.74rem; color:var(--ink-soft); margin:0 10px 10px; display:flex; align-items:center; gap:6px; }
+    .leaflet-popup-content-wrapper .popup-card{ padding-bottom:10px; }
+
+    .leaflet-control-zoom{ border-radius:14px !important; overflow:hidden; box-shadow:0 10px 22px rgba(0,0,0,0.14); }
+    .leaflet-control-zoom a{ background:rgba(255,255,255,0.94) !important; color:var(--forest-600) !important; border:none !important; }
+    .leaflet-control-scale-line{ background:rgba(255,255,255,0.85) !important; border-color:var(--forest-500) !important; color:var(--ink); border-radius:4px; }
+
+    /* admin panel di dalam map */
+    .admin-panel{
+      margin-top:16px;
+      padding:16px;
+      border-radius:18px;
+      background:rgba(255,255,255,0.97);
+      border:1px solid rgba(46,125,50,0.14);
+      box-shadow:var(--shadow-soft);
+    }
+    .admin-panel h3{ margin:0 0 3px; font-size:0.98rem; font-weight:600; color:var(--ink); display:flex; align-items:center; gap:8px; }
+    .admin-panel h3 i{ color:var(--accent-gold-dark); font-size:0.85rem; }
+    .admin-panel label{ display:block; font-size:0.78rem; font-weight:700; margin-bottom:6px; color:#344833; }
+    .admin-panel input,.admin-panel select,.admin-panel textarea{ width:100%; border:1px solid rgba(140,168,129,0.4); border-radius:12px; padding:11px 13px; font-size:0.9rem; color:var(--ink); background:#fbfdf7; transition:.2s; }
+    .admin-panel input:focus,.admin-panel select:focus,.admin-panel textarea:focus{ outline:none; border-color:var(--forest-500); box-shadow:0 0 0 3px rgba(46,125,50,0.12); background:#fff; }
+    .admin-panel textarea{ resize:vertical; min-height:82px; }
+    .admin-panel .admin-row{ display:grid; gap:14px; grid-template-columns:1fr 1fr; }
+    .admin-panel .admin-row.wide{ grid-template-columns:1fr; }
+    .admin-panel .admin-note{ margin-top:6px; font-size:0.81rem; color:var(--ink-soft); line-height:1.55; }
+    .admin-panel .admin-actions{ margin-top:16px; display:flex; gap:10px; flex-wrap:wrap; }
+    .admin-panel .admin-actions button{ border:none; border-radius:999px; padding:11px 18px; background:var(--forest-500); color:#fff; cursor:pointer; font-weight:700; font-size:0.88rem; box-shadow:0 8px 18px rgba(38,80,34,0.18); transition:.2s; }
+    .admin-panel .admin-actions button:hover{ background:var(--forest-600); transform:translateY(-1px); }
+    .admin-panel .admin-actions .btn-secondary{ background:var(--accent-gold); color:#241a00; box-shadow:0 8px 18px rgba(201,134,15,0.18); }
+    .admin-panel .admin-actions .btn-secondary:hover{ background:var(--accent-gold-dark); }
+    .admin-panel .admin-message{ margin-top:12px; font-size:0.87rem; color:#3b513f; }
+    #openMapAdminModal.btn-back{ color:var(--forest-700); background:var(--moss-100); border-color:rgba(46,125,50,0.2); }
+    #openMapAdminModal.btn-back:hover{ background:var(--accent-gold); color:#241a00; }
+
+    /* modal polish */
+    #mapAdminModal .modal-content{ border-radius:18px; border:none; box-shadow:0 26px 50px rgba(10,30,15,0.28); }
+    #mapAdminModal .modal-header{ background:linear-gradient(120deg, var(--forest-900), var(--forest-600)); color:#fff; border-radius:18px 18px 0 0; border:none; padding:16px 20px; }
+    #mapAdminModal .modal-header .modal-title{ font-family:'Fraunces',serif; font-weight:600; }
+    #mapAdminModal .btn-close{ filter:invert(1) grayscale(1) brightness(2); }
+    #mapAdminModal .modal-body{ padding:20px; }
+
+    /* ===== dusun label ===== */
+    .dusun-label{
+      font-family:'Fraunces', serif;
+      font-weight:600;
+      font-size:0.72rem;
+      color:var(--forest-900);
+      text-shadow:
+        -1px -1px 0 #fff, 1px -1px 0 #fff,
+        -1px 1px 0 #fff, 1px 1px 0 #fff,
+        0 0 6px rgba(255,255,255,0.9);
+      white-space:nowrap;
+      pointer-events:none;
+      background:transparent !important;
+      border:none !important;
+      box-shadow:none !important;
+    }
+
+    @media (max-width: 991px){
+      #map{ height:56vh; min-height:340px; }
+      .topbar{ flex-wrap:wrap; padding:14px 16px; }
+      .topbar-title p{ max-width:220px; }
+      .layer-panel{ top:0.8rem; }
+      .admin-panel{ margin-top:14px; }
+      .admin-panel .admin-row{ grid-template-columns:1fr; }
+    }
+    @media (max-width: 575px){
+      .topbar-title p{ display:none; }
+      .btn-back span{ display:none; }
+      .btn-back{ padding:9px 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container page-shell py-3 py-md-4">
+
+    <!-- ===== TOPBAR (kompak) ===== -->
+    <div class="topbar mb-4">
+      <div class="topbar-left">
+        <div class="topbar-mark"><i class="fa-solid fa-map-location-dot"></i></div>
+        <div class="topbar-title">
+          <span class="eyebrow">Sistem Informasi Spasial</span>
+          <h1 class="font-display">Peta Interaktif Desa Ujungberung</h1>
+          <p>Batas dusun, UMKM, potensi wisata &amp; kerawanan bencana</p>
+        </div>
+      </div>
+      <a href="../index.php" class="btn-back">
+        <i class="fa-solid fa-arrow-left"></i> <span>Kembali ke Beranda</span>
+      </a>
+    </div>
+
+    <div class="row g-4">
+      <!-- ===== MAP ===== -->
+      <div class="col-lg-8">
+        <div class="map-shell">
+          <div class="map-shell-tag"><i class="fa-solid fa-leaf"></i> Desa Ujungberung</div>
+          <div id="map"></div>
+        </div>
+      </div>
+
+      <!-- ===== CONTROL / LEGEND PANEL ===== -->
+      <div class="col-lg-4">
+        <div class="layer-panel">
+          <div class="layer-panel-head d-flex align-items-center gap-2">
+            <i class="fa-solid fa-layer-group"></i>
+            <div>
+              <div class="fw-bold font-display">Kontrol Layer</div>
+              <div style="font-size:0.74rem; opacity:.85;">Aktifkan / nonaktifkan tampilan peta</div>
+            </div>
+          </div>
+
+          <div class="layer-panel-body" id="layerPanelBody">
+
+            <!-- Batas Dusun - LOCKED ALWAYS ON -->
+            <div class="layer-item locked" data-layer="batasDusun">
+              <div class="layer-item-left">
+                <div class="layer-icon" style="background:#2e7d32;"><i class="fa-solid fa-draw-polygon"></i></div>
+                <div>
+                  <div class="layer-label">Batas Dusun</div>
+                  <div class="layer-sub">Selalu aktif · label nama dusun</div>
+                </div>
+              </div>
+              <label class="switch locked">
+                <input type="checkbox" checked disabled>
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <hr class="divider">
+
+            <!-- UMKM -->
+            <div class="layer-item" data-layer="umkm">
+              <div class="layer-item-left">
+                <div class="layer-icon" style="background:#e8a13d;"><i class="fa-solid fa-store"></i></div>
+                <div>
+                  <div class="layer-label">UMKM</div>
+                  <div class="layer-sub">Titik usaha masyarakat</div>
+                </div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" class="layer-toggle" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <!-- Potensi Wisata -->
+            <div class="layer-item" data-layer="potensiWisata">
+              <div class="layer-item-left">
+                <div class="layer-icon" style="background:#e8a13d;"><i class="fa-solid fa-mountain-sun"></i></div>
+                <div>
+                  <div class="layer-label">Potensi Wisata</div>
+                  <div class="layer-sub">Berjenjang berdasarkan Kelas</div>
+                </div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" class="layer-toggle">
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="mini-legend" data-legend="potensiWisata"></div>
+
+            <!-- Sebaran Wisata -->
+            <div class="layer-item mt-2" data-layer="sebaranWisata">
+              <div class="layer-item-left">
+                <div class="layer-icon" style="background:#7b1fa2;"><i class="fa-solid fa-camera-retro"></i></div>
+                <div>
+                  <div class="layer-label">Sebaran Wisata</div>
+                  <div class="layer-sub">Titik lokasi wisata + foto</div>
+                </div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" class="layer-toggle" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <!-- Kerawanan Bencana -->
+            <div class="layer-item mt-2" data-layer="kerawananBencana">
+              <div class="layer-item-left">
+                <div class="layer-icon" style="background:#d32f2f;"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <div>
+                  <div class="layer-label">Kerawanan Bencana</div>
+                  <div class="layer-sub">Tingkat Bahaya Longsor · Kelas</div>
+                </div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" class="layer-toggle">
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="mini-legend" data-legend="kerawananBencana"></div>
+
+            <div id="adminMapContainer" class="admin-panel">
+              <h3><i class="fa-solid fa-user-shield"></i>Admin: Tambah Titik Peta</h3>
+              <p class="admin-note">Login sebagai admin untuk menambahkan titik UMKM atau pariwisata, termasuk upload foto.</p>
+              <div style="display:flex; gap:8px; align-items:center;">
+                <button type="button" id="openMapAdminModal" class="btn-back" style="padding:8px 14px;">Tambah Data</button>
+                <button type="button" id="mapAdminLogoutButton" class="btn-secondary" style="margin-left:auto;">Login/Admin</button>
+              </div>
+              <!-- form moved into modal (see below) -->
+              <div id="mapAdminStatus" class="admin-message" style="margin-top:12px;"></div>
+            </div>
+            
+
+          </div>
+        </div>
+
+        
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Admin modal for adding/editing map points -->
+  <div class="modal fade" id="mapAdminModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Tambah / Edit Titik</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+        </div>
+        <div class="modal-body">
+          <form id="mapAdminForm" enctype="multipart/form-data">
+            <input type="hidden" name="id" id="mapPointId" value="0">
+            <input type="hidden" name="original_type" id="mapPointOriginalType" value="umkm">
+            <div class="admin-row">
+              <div>
+                <label for="mapPointType">Jenis Titik</label>
+                <select id="mapPointType" name="type">
+                  <option value="umkm">UMKM</option>
+                  <option value="pariwisata">Pariwisata</option>
+                </select>
+              </div>
+              <div>
+                <label for="mapPointName">Nama Titik</label>
+                <input id="mapPointName" name="name" type="text" placeholder="Contoh: Warung Bu Soleh" required>
+              </div>
+            </div>
+            <div class="admin-row">
+              <div>
+                <label for="mapPointLat">Latitude</label>
+                <input id="mapPointLat" name="latitude" type="number" step="any" placeholder="-6.775..." required>
+              </div>
+              <div>
+                <label for="mapPointLng">Longitude</label>
+                <input id="mapPointLng" name="longitude" type="number" step="any" placeholder="108.367..." required>
+              </div>
+            </div>
+            <div id="mapUmkmFields" class="admin-row wide">
+              <div>
+                <label for="mapPointCategory">Kategori UMKM</label>
+                <input id="mapPointCategory" name="kategori" type="text" placeholder="Contoh: Barang / Jasa">
+              </div>
+              <div>
+                <label for="mapPointProduct">Produk / Layanan</label>
+                <input id="mapPointProduct" name="product" type="text" placeholder="Contoh: Durian / Seblak">
+              </div>
+              <div>
+                <label for="mapPointBusinessType">Jenis Usaha</label>
+                <input id="mapPointBusinessType" name="jenis" type="text" placeholder="Contoh: Warung Makan">
+              </div>
+              <div>
+                <label for="mapPointOwner">Nama Pemilik</label>
+                <input id="mapPointOwner" name="owner" type="text" placeholder="Opsional">
+              </div>
+            </div>
+            <div id="mapPariwisataFields" class="admin-row wide" style="display:none;">
+              <div>
+                <label for="mapPointDescription">Deskripsi / Keterangan</label>
+                <textarea id="mapPointDescription" name="description" placeholder="Opsional untuk pariwisata"></textarea>
+              </div>
+            </div>
+            <div class="admin-row wide">
+              <div>
+                <label for="mapPointImage">Foto</label>
+                <input id="mapPointImage" name="image" type="file" accept="image/*">
+              </div>
+            </div>
+            <div class="admin-actions">
+              <button type="submit" id="mapAdminSubmitButton">Tambahkan Titik</button>
+              <button type="button" id="mapAdminCancelButton" class="btn-secondary" style="display:none;">Batal Edit</button>
+            </div>
+            <div id="mapAdminMessage" class="admin-message"></div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.11.0/proj4.js"></script>
+  <script>
+    proj4.defs('EPSG:32749', '+proj=utm +zone=49 +south +datum=WGS84 +units=m +no_defs');
+
+    /* ---------- Reprojection helper ---------- */
+    function transformGeoJsonCoordinates(value) {
+      if (!Array.isArray(value)) return value;
+      if (value.length >= 2 && typeof value[0] === 'number' && typeof value[1] === 'number') {
+        const [x, y] = value;
+        const converted = proj4('EPSG:32749', 'EPSG:4326', [x, y]);
+        return value.length > 2 ? [converted[0], converted[1], value[2]] : [converted[0], converted[1]];
+      }
+      return value.map(transformGeoJsonCoordinates);
+    }
+    function normalizeGeoJson(data) {
+      const crsName = data?.crs?.properties?.name || '';
+      if (!/32749/i.test(crsName)) return data;
+      return {
+        ...data,
+        features: (data.features || []).map(feature => {
+          if (!feature || !feature.geometry) return feature;
+          return { ...feature, geometry: { ...feature.geometry, coordinates: transformGeoJsonCoordinates(feature.geometry.coordinates) } };
+        })
+      };
+    }
+
+    /* ---------- Kelas -> warna & urutan (merah-kuning-hijau bertingkat) ---------- */
+    /* dipakai utk Potensi Wisata & Kerawanan Bencana - keduanya pakai skala RYG,
+       rendah = hijau, sedang = kuning, tinggi = jingga, sangat tinggi = merah */
+    function kelasRamp(type){
+      if(type === 'bencana'){
+        return [
+          { match:['rendah','sangat rendah','1'], color:'#2e7d32', label:'Rendah' },
+          { match:['sedang','2'],                 color:'#f9a825', label:'Sedang' },
+          { match:['tinggi','3'],                 color:'#f4511e', label:'Tinggi' },
+          { match:['sangat tinggi','4'],           color:'#b71c1c', label:'Sangat Tinggi' },
+        ];
+      }
+      // potensi wisata - skala merah-kuning-hijau bertingkat
+      return [
+        { match:['rendah','sangat rendah','1'], color:'#43a047', label:'Rendah' },
+        { match:['sedang','2'],                 color:'#fdd835', label:'Sedang' },
+        { match:['tinggi','3'],                 color:'#fb8c00', label:'Tinggi' },
+        { match:['sangat tinggi','4'],           color:'#e53935', label:'Sangat Tinggi' },
+      ];
+    }
+
+    function colorForKelas(kelasValue, type){
+      const ramp = kelasRamp(type);
+      const raw = String(kelasValue ?? '').trim().toLowerCase();
+      const found = ramp.find(r => r.match.includes(raw));
+      if(found) return found.color;
+      // fallback: kalau numerik tak terduga, pakai warna tengah
+      return ramp[Math.min(ramp.length-1, 1)].color;
+    }
+
+    function buildMiniLegend(selector, type){
+      const el = document.querySelector(`[data-legend="${selector}"]`);
+      if(!el) return;
+      el.innerHTML = kelasRamp(type).map(r => `
+        <span class="mini-chip"><span class="mini-dot" style="background:${r.color}"></span>${r.label}</span>
+      `).join('');
+    }
+    buildMiniLegend('kerawananBencana','bencana');
+    buildMiniLegend('potensiWisata','wisata');
+
+    /* ---------- Peta + panes (mengatur urutan tampil / z-index) ---------- */
+    const map = L.map('map', { zoomControl:false }).setView([-6.77, 108.37], 14);
+    L.control.zoom({ position:'bottomright' }).addTo(map);
+    L.control.scale({ position:'bottomleft', imperial:false }).addTo(map);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors',
+      maxZoom: 19
+    }).addTo(map);
+
+    // pane khusus supaya Batas Dusun SELALU di bawah layer lain
+    map.createPane('paneBatasDusun');
+    map.getPane('paneBatasDusun').style.zIndex = 350; // di bawah overlayPane default (400)
+    map.createPane('paneOverlays');
+    map.getPane('paneOverlays').style.zIndex = 450;
+    map.createPane('paneLabels');
+    map.getPane('paneLabels').style.zIndex = 650; // label dusun paling atas
+    map.getPane('paneLabels').style.pointerEvents = 'none';
+
+    const layerGroups = {
+      batasDusun: L.layerGroup(),
+      umkm: L.layerGroup(),
+      potensiWisata: L.layerGroup(),
+      sebaranWisata: L.layerGroup(),
+      kerawananBencana: L.layerGroup()
+    };
+
+    /* ---------- Ikon custom UMKM & Sebaran Wisata ---------- */
+    function makeDivIcon(bgColor, iconClass, size=32){
+      return L.divIcon({
+        className: '',
+        html: `<div style="
+                  width:${size}px; height:${size}px; border-radius:50% 50% 50% 0;
+                  background:${bgColor}; transform:rotate(-45deg);
+                  display:flex; align-items:center; justify-content:center;
+                  box-shadow:0 4px 10px rgba(0,0,0,0.3); border:2px solid #fff;">
+                  <i class="${iconClass}" style="transform:rotate(45deg); color:#fff; font-size:${size*0.45}px;"></i>
+                </div>`,
+        iconSize:[size,size],
+        iconAnchor:[size/2, size],
+        popupAnchor:[0, -size]
+      });
+    }
+
+    const umkmIcon = makeDivIcon('#e8a13d', 'fa-solid fa-store');
+    const wisataIcon = makeDivIcon('#7b1fa2', 'fa-solid fa-camera-retro');
+
+    /* ---------- Helper: cari field nama dusun apapun variasi penulisannya ---------- */
+    function getDusunName(props){
+      if(!props) return 'Dusun';
+      return props.NM_DUSUN || props.Nm_Dusun || props.nm_dusun ||
+             props.NAMA_DUSUN || props.Nama_Dusun || props.nama_dusun ||
+             props.DUSUN || props.Dusun || 'Dusun';
+    }
+
+    /* ---------- Helper: resolusi path gambar sebaran wisata ---------- */
+    function resolveImagePath(gambar){
+      if(!gambar) return null;
+      const val = String(gambar).trim();
+      if(!val) return null;
+      if(/^https?:\/\//i.test(val) || val.startsWith('../') || val.startsWith('/')) return val;
+      if(val.startsWith('images/') || val.startsWith('img/')) return `../${val}`;
+      return `../images/${val}`;
+    }
+
+    /* ---------- Admin helper untuk tambah titik ---------- */
+    const adminState = {
+      authenticated: false,
+      csrfToken: null,
+    };
+
+    const adminContainer = document.getElementById('adminMapContainer');
+    const mapAdminForm = document.getElementById('mapAdminForm');
+    const mapPointType = document.getElementById('mapPointType');
+    const mapPointId = document.getElementById('mapPointId');
+    const mapPointOriginalType = document.getElementById('mapPointOriginalType');
+    const mapUmkmFields = document.getElementById('mapUmkmFields');
+    const mapPariwisataFields = document.getElementById('mapPariwisataFields');
+    const mapAdminMessage = document.getElementById('mapAdminMessage');
+    const mapAdminStatus = document.getElementById('mapAdminStatus');
+    const mapAdminSubmitButton = document.getElementById('mapAdminSubmitButton');
+    const mapAdminCancelButton = document.getElementById('mapAdminCancelButton');
+    const mapAdminLogoutButton = document.getElementById('mapAdminLogoutButton');
+    const mapAdminModalTitle = document.querySelector('#mapAdminModal .modal-title');
+
+    function setAdminMessage(text, isError = false) {
+      if (mapAdminMessage) {
+        mapAdminMessage.textContent = text;
+        mapAdminMessage.style.color = isError ? '#c62828' : '#1b5e20';
+      }
+      if (mapAdminStatus) {
+        mapAdminStatus.textContent = text;
+        mapAdminStatus.style.color = isError ? '#c62828' : '#1b5e20';
+      }
+    }
+
+    function setAdminControlsEnabled(enabled) {
+      mapAdminForm.querySelectorAll('input, select, textarea, button[type=submit]').forEach(el => {
+        el.disabled = !enabled;
+      });
+      if (!enabled) {
+        mapAdminSubmitButton.textContent = 'Tambahkan Titik';
+        mapAdminCancelButton.style.display = 'none';
+      }
+    }
+
+    function renderAdminFields() {
+      const isUmkm = mapPointType.value === 'umkm';
+      mapUmkmFields.style.display = isUmkm ? 'grid' : 'none';
+      mapPariwisataFields.style.display = isUmkm ? 'none' : 'grid';
+      mapPointOriginalType.value = mapPointType.value;
+    }
+
+    function prepareEditForm(feature, type) {
+      const props = feature.properties || {};
+      mapPointId.value = props._ID || 0;
+      mapPointOriginalType.value = type;
+      mapPointType.value = type;
+      mapPointType.disabled = true;
+      document.getElementById('mapPointName').value = type === 'umkm' ? (props.Nama_UMKM || '') : (props._NAME || props.NAME || props.Nama || '');
+      document.getElementById('mapPointLat').value = props._LATITUDE || feature.geometry?.coordinates?.[1] || '';
+      document.getElementById('mapPointLng').value = props._LONGITUDE || feature.geometry?.coordinates?.[0] || '';
+      document.getElementById('mapPointCategory').value = props.Kategori_1 || '';
+      document.getElementById('mapPointProduct').value = props.Produk_y_1 || '';
+      document.getElementById('mapPointBusinessType').value = props.Jenis_Us_1 || '';
+      document.getElementById('mapPointOwner').value = props.Nama_Pem_1 || '';
+      document.getElementById('mapPointDescription').value = props.keterangan || props._REMARKS || '';
+      mapAdminSubmitButton.textContent = 'Simpan Perubahan';
+      mapAdminCancelButton.style.display = 'inline-flex';
+      if (mapAdminModalTitle) {
+        mapAdminModalTitle.textContent = type === 'umkm' ? 'Edit Titik UMKM' : 'Edit Titik Pariwisata';
+      }
+      renderAdminFields();
+      setAdminMessage(`Edit mode: ${type === 'umkm' ? 'UMKM' : 'Pariwisata'} ${mapPointType.value}`);
+
+      const modalEl = document.getElementById('mapAdminModal');
+      if (modalEl && typeof bootstrap !== 'undefined') {
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
+      }
+    }
+
+    function clearEditForm() {
+      mapAdminForm.reset();
+      mapPointId.value = 0;
+      mapPointOriginalType.value = 'umkm';
+      mapPointType.disabled = false;
+      if (mapAdminModalTitle) {
+        mapAdminModalTitle.textContent = 'Tambah / Edit Titik';
+      }
+      mapAdminSubmitButton.textContent = 'Tambahkan Titik';
+      mapAdminCancelButton.style.display = 'none';
+      renderAdminFields();
+      setAdminMessage('Silakan isi data titik baru atau pilih titik di peta untuk mengedit.');
+    }
+
+    function removeExistingFeatureMarker(featureId, type) {
+      const layerKey = type === 'pariwisata' ? 'sebaranWisata' : type;
+      const removeList = [];
+      layerGroups[layerKey].eachLayer(layer => {
+        const props = layer.feature?.properties;
+        if (props && parseInt(props._ID || '0', 10) === featureId) {
+          removeList.push(layer);
+        }
+      });
+      removeList.forEach(layer => {
+        layerGroups[layerKey].removeLayer(layer);
+        if (map.hasLayer(layer)) {
+          map.removeLayer(layer);
+        }
+      });
+    }
+
+    function addPointToMap(feature, type) {
+      const layerKey = type === 'pariwisata' ? 'sebaranWisata' : type;
+      const point = L.geoJSON(feature, {
+        pane:'paneOverlays',
+        pointToLayer: (feat, latlng) => L.marker(latlng, { icon: type === 'umkm' ? umkmIcon : wisataIcon }),
+        onEachFeature: (feat, layer) => {
+          const nama = type === 'umkm'
+            ? feat.properties?.Nama_UMKM || 'UMKM'
+            : feat.properties?._NAME || feat.properties?.NAME || feat.properties?.Nama || 'Lokasi Wisata';
+          const gambarRaw = feat.properties?.gambar || feat.properties?.foto || feat.properties?.image || feat.properties?.Gambar || null;
+          const gambar = resolveImagePath(gambarRaw);
+          const imgHtml = gambar ? `<img src="${gambar}" alt="${nama}">` : '';
+          const tag = type === 'umkm'
+            ? '<i class="fa-solid fa-location-dot"></i> UMKM Desa Ujungberung'
+            : '<i class="fa-solid fa-umbrella-beach"></i> Sebaran Wisata';
+          const editButton = `<div style="padding:0 10px 10px;"><button type="button" class="popup-edit-button" data-feature-id="${feat.properties?._ID || ''}" data-feature-type="${type}" style="width:100%; border:none; border-radius:12px; padding:8px 10px; background:#2e7d32; color:#fff; font-weight:700; cursor:pointer;">Edit Titik</button></div>`;
+          layer.bindPopup(`
+            <div class="popup-card">
+              ${imgHtml}
+              <div class="popup-title"><i class="fa-solid ${type === 'umkm' ? 'fa-store' : 'fa-camera-retro'} me-1" style="color:${type === 'umkm' ? '#e8a13d' : '#7b1fa2'};"></i>${nama}</div>
+              <div class="popup-tag">${tag}</div>
+              ${editButton}
+            </div>
+          `);
+          layer.feature = feat;
+        }
+      });
+      point.addTo(layerGroups[layerKey]);
+      if(document.querySelector(`[data-layer="${layerKey}"] .layer-toggle`).checked) {
+        point.addTo(map);
+      }
+    }
+
+    async function loadAdminStatus(){
+      try {
+        const res = await fetch('api.php?action=status');
+        const json = await res.json();
+        if(json.success && json.authenticated) {
+          adminState.authenticated = true;
+          adminState.csrfToken = json.csrf_token;
+          setAdminControlsEnabled(true);
+          setAdminMessage(`Terhubung sebagai ${json.username}.`);
+        } else {
+          adminState.authenticated = false;
+          adminState.csrfToken = null;
+          setAdminControlsEnabled(false);
+          setAdminMessage('Silakan login di halaman admin untuk dapat menambahkan titik.', true);
+        }
+      } catch (err) {
+        console.warn('Gagal memeriksa status admin', err);
+        adminState.authenticated = false;
+        adminState.csrfToken = null;
+        setAdminControlsEnabled(false);
+        setAdminMessage('Tidak dapat memeriksa status admin saat ini.', true);
+      }
+    }
+
+    mapPointType.addEventListener('change', renderAdminFields);
+    renderAdminFields();
+
+    map.on('popupopen', (e) => {
+      const button = e.popup._container.querySelector('.popup-edit-button');
+      if (!button) return;
+      button.addEventListener('click', () => {
+        const featureId = parseInt(button.dataset.featureId || '0', 10);
+        const featureType = button.dataset.featureType;
+        if (!adminState.authenticated) {
+          setAdminMessage('Silakan login sebagai admin terlebih dahulu.', true);
+          return;
+        }
+        const feature = e.popup._source?.feature || null;
+        if (!feature || !feature.properties || feature.properties._ID !== featureId) {
+          // try to locate by id in layer group fallback
+          let found = null;
+          layerGroups[featureType === 'umkm' ? 'umkm' : 'sebaranWisata'].eachLayer(layer => {
+            if (found) return;
+            const p = layer.feature?.properties;
+            if (p && parseInt(p._ID || '0', 10) === featureId) {
+              found = layer.feature;
+            }
+          });
+          if (!found) {
+            setAdminMessage('Fitur tidak dapat ditemukan untuk diedit.', true);
+            return;
+          }
+          prepareEditForm(found, featureType);
+        } else {
+          prepareEditForm(feature, featureType);
+        }
+      });
+    });
+
+    mapAdminLogoutButton.addEventListener('click', () => {
+      window.location.href = '../admin/login.php';
+    });
+
+    mapAdminCancelButton.addEventListener('click', () => {
+      const modalEl = document.getElementById('mapAdminModal');
+      const existing = modalEl ? bootstrap.Modal.getInstance(modalEl) : null;
+      if (existing) existing.hide();
+      clearEditForm();
+    });
+
+    mapAdminForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!adminState.authenticated) {
+        setAdminMessage('Silakan login terlebih dahulu sebagai admin.', true);
+        return;
+      }
+
+      const formData = new FormData(mapAdminForm);
+      formData.append('csrf_token', adminState.csrfToken);
+
+      try {
+        const response = await fetch('api.php?action=save-point', {
+          method: 'POST',
+          body: formData,
+        });
+        const result = await response.json();
+        if (!result.success) {
+          setAdminMessage(result.error || 'Gagal menyimpan titik.', true);
+          return;
+        }
+        setAdminMessage(result.message || 'Titik berhasil disimpan.');
+        const submittedType = mapPointId.value > 0 ? mapPointOriginalType.value : mapPointType.value;
+        const featureId = parseInt(mapPointId.value || '0', 10);
+        if (featureId > 0) {
+          removeExistingFeatureMarker(featureId, submittedType);
+        }
+        addPointToMap(result.feature, submittedType);
+        if (featureId > 0) {
+          mapAdminMessage.textContent = result.message || 'Titik berhasil diperbarui.';
+        }
+        // hide modal if open
+        try {
+          const modalEl = document.getElementById('mapAdminModal');
+          const existing = modalEl ? bootstrap.Modal.getInstance(modalEl) : null;
+          if (existing) existing.hide();
+        } catch (e) { /* ignore if bootstrap not available */ }
+        clearEditForm();
+      } catch (err) {
+        console.error(err);
+        setAdminMessage('Terjadi kesalahan saat mengirim data.', true);
+      }
+    });
+
+    loadAdminStatus();
+
+    // Open modal when 'Tambah Data' clicked
+    const openMapAdminModalBtn = document.getElementById('openMapAdminModal');
+    if (openMapAdminModalBtn) {
+      openMapAdminModalBtn.addEventListener('click', () => {
+        if (!adminState.authenticated) {
+          setAdminMessage('Silakan login terlebih dahulu sebagai admin.', true);
+          // optionally redirect to login
+          window.location.href = '../admin/login.php';
+          return;
+        }
+        // reset form for new entry and show modal
+        clearEditForm();
+        const modalEl = document.getElementById('mapAdminModal');
+        if (modalEl && typeof bootstrap !== 'undefined') {
+          const modal = new bootstrap.Modal(modalEl);
+          modal.show();
+        }
+      });
+    }
+
+    /* ---------- Definisi tiap layer & cara render ---------- */
+    const layerFiles = [
+      {
+        key: 'batasDusun',
+        file: '../geojson/BatasDusunUJB.geojson',
+        pane: 'paneBatasDusun',
+        render: (data) => {
+          const group = L.layerGroup();
+
+          const polygons = L.geoJSON(data, {
+            pane: 'paneBatasDusun',
+            style: { color:'#2e7d32', weight:2, fillColor:'#66bb6a', fillOpacity:0.18 },
+            onEachFeature: (feature, layer) => {
+              const nama = getDusunName(feature.properties);
+              layer.bindTooltip(nama, {
+                permanent: false,
+                direction: 'center',
+                className: 'dusun-label'
+              });
+              layer.bindPopup(`
+                <div class="popup-card">
+                  <div class="popup-title"><i class="fa-solid fa-draw-polygon me-1" style="color:#2e7d32;"></i>${nama}</div>
+                  <div class="popup-tag"><i class="fa-solid fa-map"></i> Batas Dusun</div>
+                </div>
+              `);
+            }
+          });
+          polygons.addTo(group);
+
+          // label permanen di tengah tiap polygon (pakai pane terpisah biar selalu di atas)
+          polygons.eachLayer(layer => {
+            const nama = getDusunName(layer.feature?.properties);
+            const center = layer.getBounds ? layer.getBounds().getCenter() : null;
+            if(center){
+              L.marker(center, {
+                pane: 'paneLabels',
+                interactive: false,
+                icon: L.divIcon({
+                  className: 'dusun-label',
+                  html: nama,
+                  iconSize: null
+                })
+              }).addTo(group);
+            }
+          });
+
+          return group;
+        }
+      },
+      {
+        key: 'umkm',
+        file: 'api.php?action=load-points&type=umkm',
+        fallback: '../geojson/UMKM.geojson',
+        pane: 'paneOverlays',
+        render: (data) => L.geoJSON(data, {
+          pane:'paneOverlays',
+          pointToLayer: (feature, latlng) => L.marker(latlng, { icon: umkmIcon }),
+          onEachFeature: (feature, layer) => {
+            const nama = feature.properties?.Nama_UMKM || 'UMKM';
+            const gambarRaw = feature.properties?.gambar || feature.properties?.foto || feature.properties?.image || feature.properties?.Gambar || null;
+            const gambar = resolveImagePath(gambarRaw);
+            const imgHtml = gambar ? `<img src="${gambar}" alt="${nama}">` : '';
+            const produk = feature.properties?.Produk_y_1 ? `<div style="padding:0 10px 8px; font-size:0.82rem; color:#5a6b5a;">${feature.properties.Produk_y_1}</div>` : '';
+            const editButton = `<div style="padding:0 10px 10px;"><button type="button" class="popup-edit-button" data-feature-id="${feature.properties?._ID || ''}" data-feature-type="umkm" style="width:100%; border:none; border-radius:12px; padding:8px 10px; background:#2e7d32; color:#fff; font-weight:700; cursor:pointer;">Edit Titik</button></div>`;
+            layer.bindPopup(`
+              <div class="popup-card">
+                ${imgHtml}
+                <div class="popup-title"><i class="fa-solid fa-store me-1" style="color:#e8a13d;"></i>${nama}</div>
+                <div class="popup-tag"><i class="fa-solid fa-location-dot"></i> UMKM Desa Ujungberung</div>
+                ${produk}
+                ${editButton}
+              </div>
+            `);
+            layer.feature = feature;
+          }
+        })
+      },
+      {
+        key: 'potensiWisata',
+        file: '../geojson/potensiwisata.geojson',
+        pane: 'paneOverlays',
+        render: (data) => L.geoJSON(data, {
+          pane:'paneOverlays',
+          pointToLayer: (feature, latlng) => {
+            const c = colorForKelas(feature.properties?.Kelas, 'wisata');
+            return L.circleMarker(latlng, { radius:8, color:'#fff', weight:2, fillColor:c, fillOpacity:0.95 });
+          },
+          style: (feature) => {
+            const c = colorForKelas(feature.properties?.Kelas, 'wisata');
+            return { color:c, weight:2, fillColor:c, fillOpacity:0.35 };
+          },
+          onEachFeature: (feature, layer) => {
+            const kelas = feature.properties?.Kelas ?? '-';
+            const nama = feature.properties?.Nama || feature.properties?.nama || 'Potensi Wisata';
+            layer.bindPopup(`
+              <div class="popup-card">
+                <div class="popup-title"><i class="fa-solid fa-mountain-sun me-1" style="color:#fb8c00;"></i>${nama}</div>
+                <div class="popup-tag"><i class="fa-solid fa-chart-simple"></i> Kelas: ${kelas}</div>
+              </div>
+            `);
+          }
+        })
+      },
+      {
+        key: 'sebaranWisata',
+        file: 'api.php?action=load-points&type=pariwisata',
+        pane: 'paneOverlays',
+        render: (data) => L.geoJSON(data, {
+          pane:'paneOverlays',
+          pointToLayer: (feature, latlng) => L.marker(latlng, { icon: wisataIcon }),
+          onEachFeature: (feature, layer) => {
+            const nama = feature.properties?._NAME || feature.properties?.NAME || feature.properties?.Nama || 'Lokasi Wisata';
+            const gambarRaw = feature.properties?.gambar || feature.properties?.foto || feature.properties?.image || feature.properties?.Gambar || null;
+            const gambar = resolveImagePath(gambarRaw);
+            const imgHtml = gambar ? `<img src="${gambar}" alt="${nama}">` : '';
+            const keterangan = feature.properties?.keterangan ? `<div style="padding:0 10px 8px; font-size:0.82rem; color:#5a6b5a;">${feature.properties.keterangan}</div>` : '';
+            const editButton = `<div style="padding:0 10px 10px;"><button type="button" class="popup-edit-button" data-feature-id="${feature.properties?._ID || ''}" data-feature-type="pariwisata" style="width:100%; border:none; border-radius:12px; padding:8px 10px; background:#2e7d32; color:#fff; font-weight:700; cursor:pointer;">Edit Titik</button></div>`;
+            layer.bindPopup(`
+              <div class="popup-card">
+                ${imgHtml}
+                <div class="popup-title"><i class="fa-solid fa-camera-retro me-1" style="color:#7b1fa2;"></i>${nama}</div>
+                <div class="popup-tag"><i class="fa-solid fa-umbrella-beach"></i> Sebaran Wisata</div>
+                ${keterangan}
+                ${editButton}
+              </div>
+            `);
+            layer.feature = feature;
+          }
+        })
+      },
+      {
+        key: 'kerawananBencana',
+        file: '../geojson/Tingkat_Bahaya_Longsor.geojson',
+        pane: 'paneOverlays',
+        render: (data) => L.geoJSON(data, {
+          pane:'paneOverlays',
+          pointToLayer: (feature, latlng) => {
+            const c = colorForKelas(feature.properties?.Kelas, 'bencana');
+            return L.circleMarker(latlng, { radius:8, color:'#fff', weight:2, fillColor:c, fillOpacity:0.95 });
+          },
+          style: (feature) => {
+            const c = colorForKelas(feature.properties?.Kelas, 'bencana');
+            return { color:c, weight:1.5, fillColor:c, fillOpacity:0.45 };
+          },
+          onEachFeature: (feature, layer) => {
+            const kelas = feature.properties?.Kelas ?? '-';
+            layer.bindPopup(`
+              <div class="popup-card">
+                <div class="popup-title"><i class="fa-solid fa-triangle-exclamation me-1" style="color:#d32f2f;"></i>Kerawanan Bencana</div>
+                <div class="popup-tag"><i class="fa-solid fa-chart-simple"></i> Kelas: ${kelas}</div>
+              </div>
+            `);
+          }
+        })
+      }
+    ];
+
+    function loadLayer(item){
+      fetch(item.file)
+        .then(res => { if(!res.ok) throw new Error('not found'); return res.json(); })
+        .then(data => {
+          const normalized = normalizeGeoJson(data);
+          const rendered = item.render(normalized);
+          rendered.addTo(layerGroups[item.key]);
+        })
+        .catch(err => {
+          if (item.fallback) {
+            console.warn(`${item.key}: gagal memuat API, gunakan fallback GeoJSON -> ${item.fallback}`);
+            fetch(item.fallback)
+              .then(res => res.json())
+              .then(data => {
+                const normalized = normalizeGeoJson(data);
+                const rendered = item.render(normalized);
+                rendered.addTo(layerGroups[item.key]);
+              })
+              .catch(err2 => console.warn(`${item.key}: gagal memuat fallback -> ${item.fallback}`, err2));
+          } else {
+            console.warn(`${item.key}: gagal memuat -> ${item.file}`, err);
+          }
+        });
+    }
+    layerFiles.forEach(loadLayer);
+
+    // Batas Dusun selalu tampil
+    layerGroups.batasDusun.addTo(map);
+
+    // Apply initial checked states: add any layerGroups whose toggle is checked on page load
+    document.querySelectorAll('.layer-toggle').forEach(input => {
+      const item = input.closest('.layer-item');
+      const key = item.dataset.layer;
+      if (input.checked) {
+        try { layerGroups[key].addTo(map); } catch (e) { /* ignore */ }
+        item.classList.add('active');
+      }
+    });
+
+    /* ---------- Toggle interaktif (checkbox <-> layer <-> legend styling) ---------- */
+    document.querySelectorAll('.layer-toggle').forEach(input => {
+      const item = input.closest('.layer-item');
+      const key = item.dataset.layer;
+
+      input.addEventListener('change', () => {
+        if(input.checked){
+          layerGroups[key].addTo(map);
+          item.classList.add('active');
+        } else {
+          map.removeLayer(layerGroups[key]);
+          item.classList.remove('active');
+        }
+      });
+    });
+
+    // Batas Dusun item selalu tampil aktif secara visual
+    document.querySelector('[data-layer="batasDusun"]').classList.add('active');
+  </script>
+</body>
+</html>
